@@ -5,6 +5,9 @@ import sys
 
 def main():
 
+    commands = input("Enter the commands to run separated by commas > ")
+    commands = commands.replace(',', '\n\n') + '\n'
+
     # Try to establish console connection with the device.
     try:
         console = serial.Serial(
@@ -23,13 +26,15 @@ def main():
 
     # If there is no exception, run commands and print the output.
     else:
-        command = '\r\n\nen\nshow clock\n'.encode('utf-8')
+        commands_to_run = f'\r\n\nen\n{commands}'.encode('utf-8')
 
-        console.write(command)
+        console.write(commands_to_run)
         time.sleep(3)
 
-        output = console.read(225).decode('utf-8')
-        print(output)
+        while console.inWaiting() > 0:
+            output = console.read(console.inWaiting()).decode('utf-8')
+            time.sleep(1)
+            print(output)
 
 if __name__ == "__main__":
     main()
